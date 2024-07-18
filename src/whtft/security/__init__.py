@@ -11,10 +11,9 @@ import httpx
 import jwt
 import jwt.exceptions
 import pydantic
+import whtft.app
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security.http import HTTPAuthorizationCredentials, HTTPBearer
-
-import whtft.app
 
 __version__ = "0.1.0"
 
