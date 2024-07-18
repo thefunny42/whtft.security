@@ -1,0 +1,62 @@
+[project]
+name = "whtft.security"
+description = "Who has time for that: security"
+readme = "README.md"
+dynamic = ["version"]
+authors = [{ name = 'Sylvain Viollon', email = 'thefunny@gmail.com' }]
+requires-python = '>=3.12'
+dependencies = [
+    'async-lru',
+    'cryptography',
+    'fastapi',
+    'httpx',
+    'pydantic-settings',
+    'pyjwt',
+    'whtft.app @ git+https://github.com/thefunny42/whtft.app@main',
+]
+
+[project.scripts]
+new-authentication-token = "whtft.security:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.black]
+line-length = 79
+
+[tool.coverage.report]
+# XXX Work on moving more tests here from userservice.
+fail_under = 85
+
+[tool.pytest.ini_options]
+filterwarnings = ["ignore: directory"]
+
+[tool.hatch.version]
+path = "src/whtft/security/__init__.py"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/whtft"]
+
+[tool.hatch.envs.hatch-static-analysis]
+dependencies = ["black", "flake8", "isort"]
+
+[tool.hatch.envs.hatch-static-analysis.scripts]
+format-check = [
+    "black --check --diff {args:.}",
+    "isort --check-only --diff {args:.}",
+]
+format-fix = ["isort {args:.}", "black {args:.}"]
+lint-check = "flake8 {args:.}"
+lint-fix = "lint-check"
+
+[tool.hatch.envs.hatch-test]
+randomize = true
+extra-dependencies = [
+    "whtft.security",
+    "pytest-asyncio==0.23.7",
+    "respx==0.21.1",
+]

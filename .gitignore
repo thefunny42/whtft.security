@@ -1,0 +1,7 @@
+.pytest_cache/*
+.coverage
+dist/*
+**/charts/*.tgz
+htmlcov/*
+**/__pycache__/*
+.env.local
