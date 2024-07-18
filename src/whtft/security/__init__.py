@@ -71,6 +71,20 @@ class TokenInformation(NamedTuple):
     headers: dict | None = None
 
 
+class BearerAuth(httpx.Auth):
+
+    def __init__(self, token: str):
+        self.token = token
+
+    def auth_flow(self, request):
+        if self.token:
+            request.headers["Authorization"] = f"Bearer {self.token}"
+        yield request
+
+    def __str__(self):
+        return self.token
+
+
 class Checker:
 
     def __init__(self, settings: Settings):
@@ -107,18 +121,20 @@ class Checker:
     async def generate_token(self, *roles: str):
         information = await self.__get_information()
         if information is None:
-            return ""
-        return jwt.encode(
-            {
-                "roles": list(roles),
-                "iss": self.settings.authentication_issuer,
-                "aud": self.settings.authentication_audience,
-                "exp": datetime.datetime.now(tz=datetime.timezone.utc)
-                + datetime.timedelta(seconds=180),
-            },
-            information.key,
-            algorithm=information.algorithm,
-            headers=information.headers,
+            return BearerAuth("")
+        return BearerAuth(
+            jwt.encode(
+                {
+                    "roles": list(roles),
+                    "iss": self.settings.authentication_issuer,
+                    "aud": self.settings.authentication_audience,
+                    "exp": datetime.datetime.now(tz=datetime.timezone.utc)
+                    + datetime.timedelta(seconds=180),
+                },
+                information.key,
+                algorithm=information.algorithm,
+                headers=information.headers,
+            )
         )
 
     async def authenticate(self, token: str) -> list[str] | None:

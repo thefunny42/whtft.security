@@ -25,58 +25,44 @@ TEST_JWKS_KEYS = {
 }
 
 
-class BearerAuth(httpx.Auth):
-
-    def __init__(self, token: str):
-        self.token = token
-
-    def auth_flow(self, request):
-        request.headers["Authorization"] = f"Bearer {self.token}"
-        yield request
+@pytest.fixture(scope="module")
+def checker():
+    return whtft.security.Checker(whtft.security.Settings())
 
 
 @pytest.fixture(scope="module")
-def settings():
-    return whtft.security.Settings()
-
-
-@pytest.fixture(scope="module")
-def jwks_settings():
-    return whtft.security.Settings(
-        authentication_key=None,
-        authentication_jwks_url=pydantic_core.Url(TEST_JWKS_URL),
+def jwks_checker():
+    return whtft.security.Checker(
+        whtft.security.Settings(
+            authentication_key=None,
+            authentication_jwks_url=pydantic_core.Url(TEST_JWKS_URL),
+        )
     )
 
 
 @pytest.fixture(scope="module")
 def invalid_token():
-    return BearerAuth(secrets.token_urlsafe(16))
+    return whtft.security.BearerAuth(secrets.token_urlsafe(16))
 
 
 @pytest_asyncio.fixture()
-async def token(settings):
-    return BearerAuth(await whtft.security.Checker(settings).generate_token())
+async def token(checker):
+    return await checker.generate_token()
 
 
 @pytest_asyncio.fixture()
-async def jwks_token(mocked_jwks, jwks_settings):
-    return BearerAuth(
-        await whtft.security.Checker(jwks_settings).generate_token()
-    )
+async def jwks_token(mocked_jwks, jwks_checker):
+    return await jwks_checker.generate_token()
 
 
 @pytest_asyncio.fixture()
-async def admin_token(settings):
-    return BearerAuth(
-        await whtft.security.Checker(settings).generate_token("admin")
-    )
+async def admin_token(checker):
+    return await checker.generate_token("admin")
 
 
 @pytest_asyncio.fixture()
-async def jwks_admin_token(mocked_jwks, jwks_settings):
-    return BearerAuth(
-        await whtft.security.Checker(jwks_settings).generate_token("admin")
-    )
+async def jwks_admin_token(mocked_jwks, jwks_checker):
+    return await jwks_checker.generate_token("admin")
 
 
 @pytest.fixture
