@@ -191,8 +191,13 @@ class Checker:
         logger.info(f"Authorized request with: {query} ")
 
 
+class PermissiveSettings(Settings):
+    model_config = Settings.model_config.copy()
+    model_config["extra"] = "ignore"
+
+
 async def print_generated_token(*roles: str):
-    print(await Checker(Settings()).generate_token(*roles))
+    print(await Checker(PermissiveSettings()).generate_token(*roles))
 
 
 def main():  # pragma: no cover
