@@ -31,7 +31,7 @@ class Settings(whtft.app.Settings):
     authentication_issuer: str = pydantic.Field(default="")
     authentication_audience: str = pydantic.Field(default="")
     authorization_endpoint: pydantic.HttpUrl = pydantic.Field(default=...)
-    authorization_policy: str = pydantic.Field(default="userservice")
+    authorization_policy: str = pydantic.Field(default=...)
 
     @pydantic.computed_field
     @functools.cached_property

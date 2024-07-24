@@ -1,0 +1,11 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "opa.fullname" . }}
+  labels:
+    {{- include "opa.labels" . | nindent 4 }}
+spec:
+  minAvailable: 75%
+  selector:
+    matchLabels:
+      {{- include "opa.selectorLabels" . | nindent 6 }}

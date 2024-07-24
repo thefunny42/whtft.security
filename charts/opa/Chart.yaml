@@ -1,0 +1,6 @@
+apiVersion: v2
+name: opa
+description: Run the open policy agent with a set of policies
+type: application
+version: 0.66.0
+appVersion: "0.66.0"
